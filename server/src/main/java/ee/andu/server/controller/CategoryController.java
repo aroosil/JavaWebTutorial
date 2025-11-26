@@ -1,5 +1,59 @@
 package ee.andu.server.controller;
 
+import ee.andu.server.entity.Category;
+import ee.andu.server.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
 public class CategoryController {
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @GetMapping("categories")
+    public List<Category> getCategory()
+    {
+        return categoryRepository.findAll() ;
+    }
+
+    @PostMapping("categories")
+    public ResponseEntity<List<Category>> saveCategory(@RequestBody Category category)
+    {
+        if (category.getId() != null)
+        {
+            throw new RuntimeException("Cannot add with Id");
+        }
+        if (category.getName() == null || category.getName().isBlank())
+        {
+            throw new RuntimeException("Name is required");
+        }
+        if (categoryRepository.findByName(category.getName()) != null)
+        {
+            throw new RuntimeException("Category name already exists: " +  category.getName());
+        }
+        categoryRepository.save(category);
+        return ResponseEntity.status(201).body(categoryRepository.findAll());
+    }
+
+    @DeleteMapping("categories/{id}")
+    public ResponseEntity<List<Category>> deleteCategoryById(@PathVariable Long id)
+    {
+        categoryRepository.deleteById(id);
+        return ResponseEntity.status(200).body(categoryRepository.findAll());
+    }
+
+    //    @PutMapping("categories")
+    //    public List<Category> updateProduct(@RequestBody Category category)
+    //    {
+    //        if (category.getId() == null)
+    //        {
+    //            throw new RuntimeException("Cannot update product without id");
+    //        }
+    //        categoryRepository.save(category);
+    //        return categoryRepository.findAll();
+    //    }
 }

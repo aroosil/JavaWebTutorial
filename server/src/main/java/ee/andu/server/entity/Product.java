@@ -1,9 +1,6 @@
 package ee.andu.server.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,4 +23,14 @@ public class Product {
     private boolean active;
     private int stock;
 
+    @ManyToOne // teine toode võib sama kategooriat kasutada
+    // @JoinColumn(name = "category_id")
+    private Category category;
+
+
+    // olemas ka @OneToOne ---> ükski teine toode ei või seda kategooriat võtta
+    //    @OneToOne(cascade = CascadeType.ALL)
+    //    private Image image;
+    //    @OneToOne
+    //    private Ingredients ingredients;
 }
