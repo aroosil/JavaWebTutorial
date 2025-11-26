@@ -19,11 +19,11 @@ public class ProductController {
 
     // BASE URL + API endpoint
     // localhost:8080/hi
-    @GetMapping("hi")
-    public String hello()
-    {
-        return "Hello World";
-    }
+    //    @GetMapping("hi")
+    //    public String hello()
+    //    {
+    //        return "Hello World";
+    //    }
 
     @GetMapping("products")
     public List<Product> getProducts()
