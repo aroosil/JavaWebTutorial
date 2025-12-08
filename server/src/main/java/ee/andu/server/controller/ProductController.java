@@ -12,6 +12,7 @@ import java.util.List;
 //import org.springframework.web.bind.annotation.RequestMethod;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProductController {
 
     @Autowired
@@ -38,6 +39,9 @@ public class ProductController {
         {
             throw new RuntimeException("Cannot add with Id");
         }
+        if (product.getCategory() == null || product.getCategory().getId() == null) {
+            throw new RuntimeException("Cannot add without Category or Category Id being null");
+        }
         productRepository.save(product);
         return productRepository.findAll(); // SELECT * FROM products
     }
@@ -51,12 +55,12 @@ public class ProductController {
     }
 
     // DELETE localhost:8080/products?id=2
-    @DeleteMapping("products")
-    public List<Product> deleteProduct(@RequestParam Long id)
-    {
-        productRepository.deleteById(id);
-        return productRepository.findAll(); // SELECT * FROM products
-    }
+    //    @DeleteMapping("products")
+    //    public List<Product> deleteProduct(@RequestParam Long id)
+    //    {
+    //        productRepository.deleteById(id);
+    //        return productRepository.findAll(); // SELECT * FROM products
+    //    }
 
     @GetMapping("products/{id}")
     public Product getProductById(@PathVariable Long id)

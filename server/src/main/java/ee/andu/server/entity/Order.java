@@ -28,6 +28,6 @@ public class Order {
     private Person person;
 
     @ManyToMany
-    private List<Product> products;
+    private List<Product> products; // tabeli nimi orders_products kuna manytomany tekitab seosed kahe tabeli vahele uues tabelis
 
 }
