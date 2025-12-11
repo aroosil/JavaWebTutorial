@@ -1,79 +1,35 @@
-import { useEffect, useState } from "react";
 // import reactLogo from "./assets/react.svg";
 // import viteLogo from "/vite.svg";
 import "./App.css";
-
-type Category = {
-  id: number;
-  name: string;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-  active: boolean;
-  category: Category;
-};
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import Cart from "./pages/Cart";
+import NotFound from "./pages/NotFound";
+import Menu from "./components/Menu";
+import AddProduct from "./pages/admin/AddProduct";
+import ManageProducts from "./pages/admin/ManageProducts";
+import ManageCategories from "./pages/admin/ManageCategories";
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  const [selection, setSelection] = useState<Product[]>([]);
-
-  // onLoad funktsioon - > l2heb 1x k2ima
-  // TODO: promise handling? retry 3 times
-  useEffect(() => {
-    function doFetch(
-      address: string,
-      retries: number,
-      action: (arg: any) => void
-    ) {
-      fetch(address)
-        .then((result) => {
-          if (result && result.ok) {
-            return result.json();
-          }
-          console.log("got null");
-          if (retries <= 0) {
-            return;
-          }
-          console.log(address, ". Retries left: ", retries);
-          retries -= 1;
-        })
-        .then((json) => {
-          if (json == null) {
-            return;
-          }
-          action(json);
-        })
-        .catch();
-    }
-
-    doFetch("http://localhost:8080/products", 3, setProducts);
-    doFetch("http://localhost:8080/categories", 3, setCategories);
-  }, []);
-
   return (
     <>
-      <b>Categories</b>
+      <Menu />
+      <Routes>
+        <Route path="/" element={<HomePage></HomePage>} />
+        <Route path="/ostukorv" element={<Cart></Cart>} />
 
-      <select>
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+        <Route path="/admin/lisa-toode" element={<AddProduct></AddProduct>} />
+        <Route
+          path="/admin/halda-tooteid"
+          element={<ManageProducts></ManageProducts>}
+        />
+        <Route
+          path="/admin/halda-kategooriaid"
+          element={<ManageCategories></ManageCategories>}
+        />
 
-      <br></br>
-      <b>Products</b>
-
-      {products.map((product) => (
-        <div key={product.id}>{product.name}</div>
-      ))}
+        <Route path="/*" element={<NotFound></NotFound>} />
+      </Routes>
 
       {/* 
 
