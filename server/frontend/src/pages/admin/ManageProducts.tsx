@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import type { Product } from "../../models/product";
 import Table from "react-bootstrap/Table";
 import { Button } from "react-bootstrap";
-import { DoFetch } from "../../helpers/DoFetch";
+import { DoGet } from "../../helpers/DoGet";
 
 function ManageProducts() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    DoFetch("http://localhost:8080/products", 3, setProducts);
+    DoGet("http://localhost:8080/products", 3, setProducts);
   });
 
   function deleteProduct(productId: number) {

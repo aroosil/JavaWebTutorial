@@ -41,13 +41,18 @@ public class CategoryController {
             throw new RuntimeException("Category name already exists: " +  category.getName());
         }
         categoryRepository.save(category);
+
         return ResponseEntity.status(201).body(categoryRepository.findAll());
     }
 
     @DeleteMapping("categories/{id}")
     public ResponseEntity<List<Category>> deleteCategoryById(@PathVariable Long id)
     {
-        categoryRepository.deleteById(id);
+        try {
+            categoryRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot delete when in use!");
+        }
         return ResponseEntity.status(200).body(categoryRepository.findAll());
     }
 

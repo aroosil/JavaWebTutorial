@@ -1,9 +1,12 @@
-export function DoFetch(
+//TODO: improve or rename to DoGet
+
+export function DoGet(
   address: string,
   retries: number,
-  action: (arg: any) => void
-) {
-  fetch(address)
+  setter: (arg: any) => void,
+  errorPrefix?: String
+): Promise<any> {
+  return fetch(address)
     .then((result) => {
       if (result && result.ok) {
         return result.json();
@@ -19,7 +22,11 @@ export function DoFetch(
       if (json == null) {
         return;
       }
-      action(json);
+      setter(json);
+      return json;
     })
-    .catch();
+    .catch((error) => {
+      errorPrefix = errorPrefix || "";
+      console.log(errorPrefix + error);
+    });
 }

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Product } from "../models/product";
 import type { Category } from "../models/category";
-import BasicDropdown from "../components/BasicDropdown";
+import CategoryDropdown from "../components/CategoryDropdown";
+import { DoGet } from "../helpers/DoGet";
 
 function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -9,15 +10,15 @@ function HomePage() {
 
   const [selected, setSelected] = useState<Product[]>([]);
 
-  function filterProducts(category: String): void {
-    if (category == "ALL") {
+  function filterProducts(categoryName: String): void {
+    if (categoryName == "ALL") {
       setSelected(products);
       return;
     }
     var newSelection: Product[] = [];
 
     products.forEach((product) => {
-      if (product.category.name == category) {
+      if (product.category.name == categoryName) {
         newSelection[newSelection.length] = product;
       }
     });
@@ -28,86 +29,53 @@ function HomePage() {
   // onLoad funktsioon - > l2heb 1x k2ima
   // TODO: promise handling? retry 3 times
   useEffect(() => {
-    function doFetch(
-      address: string,
-      retries: number,
-      action: (arg: any) => void,
-      isProducts?: boolean
-    ) {
-      fetch(address)
-        .then((result) => {
-          if (result && result.ok) {
-            return result.json();
-          }
-          console.log("got null");
-          if (retries <= 0) {
-            return;
-          }
-          console.log(address, ". Retries left: ", retries);
-          retries -= 1;
-        })
-        .then((json) => {
-          if (json == null) {
-            return;
-          }
-          action(json);
-          console.log(action);
-          if (isProducts) {
-            setSelected(json);
-          }
-        })
-        .catch();
-    }
+    var productsPromise = DoGet(
+      "http://localhost:8080/products",
+      3,
+      setProducts,
+      "GET PRODUCTS: "
+    );
+    productsPromise.then((result) => {
+      setSelected(result);
+    });
 
-    doFetch("http://localhost:8080/products", 3, setProducts, true);
-    doFetch("http://localhost:8080/categories", 3, setCategories);
+    var categoryPromise = DoGet(
+      "http://localhost:8080/categories",
+      3,
+      setCategories,
+      "GET CATEGORIES: "
+    );
+    categoryPromise.then((result) => {
+      result[0] = { id: 0, name: "ALL" }; // add an option to select all
+      setCategories(result);
+    });
   }, []);
+
+  function addToCart(product: Product) {
+    const productsInCart: Product[] = JSON.parse(
+      localStorage.getItem("cart") || "[]"
+    );
+    productsInCart.push(product);
+    localStorage.setItem("cart", JSON.stringify(productsInCart));
+  }
+
   return (
     <>
       <div>HomePage</div>
       <div>
         <b>Categories</b>
         <br></br>
-        <BasicDropdown></BasicDropdown>
-        <select
-          onChange={(event) => {
-            filterProducts(event.target.value);
-          }}
-        >
-          <option key={0} value={"ALL"}>
-            {"ALL"}
-          </option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.name}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        {/* {['Primary', 'Secondary', 'Success', 'Info', 'Warning', 'Danger'].map(
-        (variant) => (
-          <DropdownButton
-            as={ButtonGroup}
-            key={variant}
-            id={`dropdown-variants-${variant}`}
-            variant={variant.toLowerCase()}
-            title={variant}
-          >
-            <Dropdown.Item eventKey="1">Action</Dropdown.Item>
-            <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
-            <Dropdown.Item eventKey="3" active>
-              Active Item
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
-          </DropdownButton>
-        ),
-      )} */}
+        {CategoryDropdown(categories, filterProducts)}
 
         <br></br>
         <b>Products</b>
 
         {selected.map((product) => (
-          <div key={product.id}>{product.name}</div>
+          <div key={product.id}>
+            <div>{product.name}</div>
+            <div>{product.price}€</div>
+            <button onClick={() => addToCart(product)}>Lisa ostukorvi</button>
+          </div>
         ))}
       </div>
     </>
