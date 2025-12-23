@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "../../models/product";
+import { ToastContainer, toast } from "react-toastify";
+import type { Category } from "../../models/category";
+import { DoGet } from "../../helpers/DoGet";
 
 function AddProduct() {
   const [product, setProduct] = useState<Product>({
@@ -12,6 +15,16 @@ function AddProduct() {
       name: "",
     },
   });
+  const [categories, setCategories] = useState<Category[]>();
+
+  useEffect(() => {
+    DoGet(
+      "http://localhost:8080/categories",
+      3,
+      setCategories,
+      "GET CATEGORIES: "
+    );
+  }, []);
 
   function addProduct() {
     fetch("http://localhost:8080/products", {
@@ -22,7 +35,10 @@ function AddProduct() {
       },
     })
       .then((res) => res.json())
-      .then((json) => console.log(json));
+      .then((json) => {
+        console.log(json);
+        toast.success("Product added!");
+      });
   }
 
   return (
@@ -32,6 +48,7 @@ function AddProduct() {
         onChange={(e) => setProduct({ ...product, name: e.target.value })}
         type="text"
       ></input>
+      <br />
 
       <label>Price</label>
       <input
@@ -40,6 +57,7 @@ function AddProduct() {
         }
         type="number"
       ></input>
+      <br />
 
       <label>Stock</label>
       <input
@@ -48,16 +66,35 @@ function AddProduct() {
         }
         type="number"
       ></input>
+      <br />
 
       <label>Active</label>
       <input
         onChange={(e) => setProduct({ ...product, active: e.target.checked })}
         type="checkbox"
       ></input>
+      <br />
 
-      <select></select>
+      <label>Category</label>
+      <select
+        defaultValue={product.category?.id}
+        onChange={(e) => {
+          setProduct({
+            ...product,
+            category: { id: Number(e.target.value), name: "" },
+          });
+        }}
+      >
+        {categories?.map((cat) => (
+          <option key={cat.id} value={cat.id}>
+            {cat.name}
+          </option>
+        ))}
+      </select>
+      <br />
 
       <button onClick={() => addProduct()}>Add product</button>
+      <ToastContainer />
     </div>
   );
 }

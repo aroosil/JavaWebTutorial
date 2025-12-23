@@ -29,7 +29,13 @@ public class ProductController {
     @GetMapping("products")
     public List<Product> getProducts()
     {
-        return productRepository.findAll(); // SELECT * FROM products
+        return productRepository.findByActiveTrueOrderByIdAsc(); // SELECT * FROM products
+    }
+
+    @GetMapping("admin-products")
+    public List<Product> getAdminProducts()
+    {
+        return productRepository.findByOrderByIdAsc(); // SELECT * FROM products
     }
 
     @PostMapping("products")
@@ -43,7 +49,7 @@ public class ProductController {
             throw new RuntimeException("Cannot add without Category or Category Id being null");
         }
         productRepository.save(product);
-        return productRepository.findAll(); // SELECT * FROM products
+        return productRepository.findByOrderByIdAsc(); // SELECT * FROM products
     }
 
     // DELETE localhost:8080/products/id
@@ -69,14 +75,13 @@ public class ProductController {
     }
 
     @PutMapping("products")
-    public List<Product> updateProduct(@RequestBody Product product)
+    public Product updateProduct(@RequestBody Product product)
     {
         if (product.getId() == null)
         {
             throw new RuntimeException("Cannot update product without Id");
         }
-        productRepository.save(product);
-        return productRepository.findAll(); // SELECT * FROM products
+        return productRepository.save(product);
     }
 
     // erinev lähenemine

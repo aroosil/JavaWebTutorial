@@ -9,6 +9,8 @@ import Menu from "./components/Menu";
 import AddProduct from "./pages/admin/AddProduct";
 import ManageProducts from "./pages/admin/ManageProducts";
 import ManageCategories from "./pages/admin/ManageCategories";
+import SingleProduct from "./pages/SingleProduct";
+import EditProduct from "./pages/admin/EditProduct";
 
 function App() {
   return (
@@ -27,6 +29,9 @@ function App() {
           path="/admin/halda-kategooriaid"
           element={<ManageCategories></ManageCategories>}
         />
+        <Route path="admin/muuda-toode/:product_id" element={<EditProduct />} />
+
+        <Route path="toode/:product_id" element={<SingleProduct />} />
 
         <Route path="/*" element={<NotFound></NotFound>} />
       </Routes>

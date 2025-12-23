@@ -3,6 +3,7 @@ import type { Product } from "../models/product";
 import type { Category } from "../models/category";
 import CategoryDropdown from "../components/CategoryDropdown";
 import { DoGet } from "../helpers/DoGet";
+import { Link } from "react-router-dom";
 
 function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -75,6 +76,9 @@ function HomePage() {
             <div>{product.name}</div>
             <div>{product.price}€</div>
             <button onClick={() => addToCart(product)}>Lisa ostukorvi</button>
+            <Link to={"/toode/" + product.id}>
+              <button>Vaata lähemalt</button>
+            </Link>
           </div>
         ))}
       </div>
